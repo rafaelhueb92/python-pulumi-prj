@@ -1,160 +1,164 @@
- # AWS Python MySQL RDS Pulumi Template
+# 🚀 AWS Python MySQL RDS Pulumi Template
 
- A Pulumi template for provisioning a MySQL RDS instance on AWS using Python, with a GitHub Actions CI/CD workflow.
+[![Pulumi CI/CD](https://github.com/rafaelhueb92/python-pulumi-prj/actions/workflows/pulumi.yml/badge.svg)](https://github.com/rafaelhueb92/python-pulumi-prj/actions/workflows/pulumi.yml)
+[![Pulumi](https://img.shields.io/badge/Pulumi-IaC-8A3391?logo=pulumi&logoColor=white)](https://www.pulumi.com/)
+[![Python](https://img.shields.io/badge/Python-3.6%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![AWS](https://img.shields.io/badge/AWS-RDS%20%7C%20EC2-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+[![OIDC](https://img.shields.io/badge/Auth-GitHub%20OIDC-2088FF?logo=githubactions&logoColor=white)](https://github.com/rafaelhueb92/oidc-github-actions-role-aws/)
 
- ## Overview
+A Pulumi template for provisioning a MySQL RDS instance on AWS using Python, with a GitHub Actions CI/CD workflow.
 
- This template provisions:
- - An `aws.rds.SubnetGroup` and `aws.ec2.SecurityGroup` in the account's default VPC.
- - An `aws.rds.Instance` running MySQL, with the engine version, instance class, storage and credentials driven by Pulumi config.
+## 📖 Overview
 
- ## Prerequisites
+This template provisions:
+- An `aws.rds.SubnetGroup` and `aws.ec2.SecurityGroup` in the account's default VPC.
+- An `aws.rds.Instance` running MySQL, with the engine version, instance class, storage and credentials driven by Pulumi config.
 
- - An AWS account with permissions to create RDS, EC2 (VPC/SG) resources.
- - AWS credentials configured in your environment (for example via AWS CLI or environment variables).
- - Python 3.6 or later installed.
- - Pulumi CLI already installed and logged in.
+## ✅ Prerequisites
 
- ## Getting Started
+- An AWS account with permissions to create RDS, EC2 (VPC/SG) resources.
+- AWS credentials configured in your environment (for example via AWS CLI or environment variables).
+- Python 3.6 or later installed.
+- Pulumi CLI already installed and logged in.
 
- 1. Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
- 2. Select/create the stack:
-    ```bash
-    pulumi stack select dev
-    ```
- 3. Set the DB master password as a secret (required, not stored in plain config):
-    ```bash
-    pulumi config set --secret dbPassword <your-password>
-    ```
- 4. Preview the planned changes:
-    ```bash
-    pulumi preview
-    ```
- 5. Deploy the stack:
-    ```bash
-    pulumi up
-    ```
- 6. Tear down when finished:
-    ```bash
-    pulumi destroy
-    ```
+## 🏁 Getting Started
 
- ## Project Layout
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Select/create the stack:
+   ```bash
+   pulumi stack select dev
+   ```
+3. Set the DB master password as a secret (required, not stored in plain config):
+   ```bash
+   pulumi config set --secret dbPassword <your-password>
+   ```
+4. Preview the planned changes:
+   ```bash
+   pulumi preview
+   ```
+5. Deploy the stack:
+   ```bash
+   pulumi up
+   ```
+6. Tear down when finished:
+   ```bash
+   pulumi destroy
+   ```
 
- ```
- ├── __main__.py                     # Entry point of the Pulumi program (RDS MySQL)
- ├── Pulumi.yaml                     # Project metadata and template configuration
- ├── Pulumi.<stack>.yaml             # Stack-specific configuration (e.g., Pulumi.dev.yaml)
- ├── requirements.txt                # Python dependencies
- └── .github/workflows/pulumi.yml    # CI/CD workflow (preview/up/destroy)
- ```
+## 🗂️ Project Layout
 
- ## Configuration
+```
+├── __main__.py                     # Entry point of the Pulumi program (RDS MySQL)
+├── Pulumi.yaml                     # Project metadata and template configuration
+├── Pulumi.<stack>.yaml             # Stack-specific configuration (e.g., Pulumi.dev.yaml)
+├── requirements.txt                # Python dependencies
+└── .github/workflows/pulumi.yml    # CI/CD workflow (preview/up/destroy)
+```
 
- | Key                    | Description                              | Default        |
- |-------------------------|-------------------------------------------|----------------|
- | `aws:region`            | AWS region to deploy into                 | `us-east-1`    |
- | `dbEngineVersion`       | MySQL engine version                      | `8.0.35`       |
- | `dbInstanceClass`       | RDS instance class                        | `db.t3.micro`  |
- | `dbAllocatedStorage`    | Allocated storage in GB                   | `20`           |
- | `dbName`                | Initial database name                     | `appdb`        |
- | `dbUsername`            | Master username                           | `admin`        |
- | `dbPassword` (secret)   | Master password — must be set as a secret | none, required |
- | `applyImmediately`      | Apply changes (e.g. version) immediately  | `true`         |
+## ⚙️ Configuration
 
- View or update configuration with:
- ```bash
- pulumi config get dbEngineVersion
- pulumi config set dbEngineVersion 8.0.39
- ```
+| Key                    | Description                              | Default        |
+|-------------------------|-------------------------------------------|----------------|
+| `aws:region`            | AWS region to deploy into                 | `us-east-1`    |
+| `dbEngineVersion`       | MySQL engine version                      | `8.0.35`       |
+| `dbInstanceClass`       | RDS instance class                        | `db.t3.micro`  |
+| `dbAllocatedStorage`    | Allocated storage in GB                   | `20`           |
+| `dbName`                | Initial database name                     | `appdb`        |
+| `dbUsername`            | Master username                           | `admin`        |
+| `dbPassword` (secret)   | Master password — must be set as a secret | none, required |
+| `applyImmediately`      | Apply changes (e.g. version) immediately  | `true`         |
 
- ## Testing a New Engine Version & Checking Drift
+View or update configuration with:
+```bash
+pulumi config get dbEngineVersion
+pulumi config set dbEngineVersion 8.0.39
+```
 
- 1. Before changing anything, refresh Pulumi's state against the real infrastructure and review any drift:
-    ```bash
-    pulumi refresh --diff
-    ```
- 2. Set the new engine version you want to test:
-    ```bash
-    pulumi config set dbEngineVersion 8.0.39
-    ```
- 3. Preview the change to confirm only the engine version (and any drifted attributes) will be updated:
-    ```bash
-    pulumi preview --diff
-    ```
- 4. Apply it:
-    ```bash
-    pulumi up
-    ```
- 5. After testing, re-run `pulumi refresh --diff` again to confirm the live instance now matches the desired state and there is no further drift.
+## 🔍 Testing a New Engine Version & Checking Drift
 
- ## Outputs
+1. Before changing anything, refresh Pulumi's state against the real infrastructure and review any drift:
+   ```bash
+   pulumi refresh --diff
+   ```
+2. Set the new engine version you want to test:
+   ```bash
+   pulumi config set dbEngineVersion 8.0.39
+   ```
+3. Preview the change to confirm only the engine version (and any drifted attributes) will be updated:
+   ```bash
+   pulumi preview --diff
+   ```
+4. Apply it:
+   ```bash
+   pulumi up
+   ```
+5. After testing, re-run `pulumi refresh --diff` again to confirm the live instance now matches the desired state and there is no further drift.
 
- Once deployed, the stack exports:
+## 📤 Outputs
 
- - `db_endpoint` — the connection endpoint (host:port) of the RDS instance.
- - `db_address` — the hostname of the RDS instance.
- - `db_port` — the port of the RDS instance.
- - `db_engine_version` — the engine version currently applied.
+Once deployed, the stack exports:
 
- Retrieve outputs with:
- ```bash
- pulumi stack output db_endpoint
- ```
+- `db_endpoint` — the connection endpoint (host:port) of the RDS instance.
+- `db_address` — the hostname of the RDS instance.
+- `db_port` — the port of the RDS instance.
+- `db_engine_version` — the engine version currently applied.
 
- ## CI/CD: GitHub Actions
+Retrieve outputs with:
+```bash
+pulumi stack output db_endpoint
+```
 
- The workflow at `.github/workflows/pulumi.yml` runs on:
- - `push` to `main` → `pulumi up`
- - `pull_request` targeting `main` → `pulumi preview`
- - `workflow_dispatch` (manual run) → `pulumi up`, unless the `destroy` input is set to `true`, in which case it runs `pulumi destroy`. The `destroy` input defaults to `false`.
+## 🔄 CI/CD: GitHub Actions
 
- ### Required GitHub secrets
+The workflow at `.github/workflows/pulumi.yml` runs on:
+- `push` to `main` → `pulumi up`
+- `pull_request` targeting `main` → `pulumi preview`
+- `workflow_dispatch` (manual run) → `pulumi up`, unless the `destroy` input is set to `true`, in which case it runs `pulumi destroy`. The `destroy` input defaults to `false`.
 
- AWS authentication uses OIDC — GitHub Actions assumes an IAM role via short-lived tokens, no long-lived AWS access keys are stored.
+### 🔐 Required GitHub secrets
+
+AWS authentication uses OIDC — GitHub Actions assumes an IAM role via short-lived tokens, no long-lived AWS access keys are stored.
 
 The IAM role and OIDC provider assumed by this workflow are created using the [oidc-github-actions-role-aws](https://github.com/rafaelhueb92/oidc-github-actions-role-aws/) repo.
 
-The IAM role and OIDC provider assumed by this workflow are created using the [oidc-github-actions-role-aws](https://github.com/rafaelhueb92/oidc-github-actions-role-aws/) repo.
+| Secret                    | Purpose                                     |
+|---------------------------|-----------------------------------------------|
+| `PULUMI_ACCESS_TOKEN`     | Pulumi Cloud access token (state backend)     |
 
- | Secret                    | Purpose                                     |
- |---------------------------|-----------------------------------------------|
- | `PULUMI_ACCESS_TOKEN`     | Pulumi Cloud access token (state backend)     |
+The workflow requests `id-token: write` permission and calls `aws-actions/configure-aws-credentials` with:
+```yaml
+role-to-assume: arn:aws:iam::263015886462:role/GitHubActionsRole-${{ github.event.repository.name }}
+```
+The account ID (`263015886462`) was resolved with `aws sts get-caller-identity` against the account this project deploys to, and is hardcoded directly in the workflow rather than stored as a secret (account IDs aren't sensitive). The repository name (without the org/owner) comes automatically from `github.event.repository.name`. This assumes the IAM role is named `GitHubActionsRole-<repo-name>` — create it with that name, or adjust the expression to match your naming convention. If you deploy this to a different AWS account, update the account ID accordingly (re-run `aws sts get-caller-identity` to get the new value).
 
- The workflow requests `id-token: write` permission and calls `aws-actions/configure-aws-credentials` with:
- ```yaml
- role-to-assume: arn:aws:iam::263015886462:role/GitHubActionsRole-${{ github.event.repository.name }}
- ```
- The account ID (`263015886462`) was resolved with `aws sts get-caller-identity` against the account this project deploys to, and is hardcoded directly in the workflow rather than stored as a secret (account IDs aren't sensitive). The repository name (without the org/owner) comes automatically from `github.event.repository.name`. This assumes the IAM role is named `GitHubActionsRole-<repo-name>` — create it with that name, or adjust the expression to match your naming convention. If you deploy this to a different AWS account, update the account ID accordingly (re-run `aws sts get-caller-identity` to get the new value).
+The role must trust GitHub's OIDC provider (`token.actions.githubusercontent.com`) and be scoped (via its trust policy `sub` condition) to this repository, e.g.:
 
- The role must trust GitHub's OIDC provider (`token.actions.githubusercontent.com`) and be scoped (via its trust policy `sub` condition) to this repository, e.g.:
+```json
+{
+  "Effect": "Allow",
+  "Principal": { "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com" },
+  "Action": "sts:AssumeRoleWithWebIdentity",
+  "Condition": {
+    "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
+    "StringLike": { "token.actions.githubusercontent.com:sub": "repo:<ORG>/<REPO>:*" }
+  }
+}
+```
 
- ```json
- {
-   "Effect": "Allow",
-   "Principal": { "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com" },
-   "Action": "sts:AssumeRoleWithWebIdentity",
-   "Condition": {
-     "StringEquals": { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
-     "StringLike": { "token.actions.githubusercontent.com:sub": "repo:<ORG>/<REPO>:*" }
-   }
- }
- ```
+The role's permission policy needs RDS, EC2 (VPC/SG/subnets) and STS `GetCallerIdentity` permissions.
 
- The role's permission policy needs RDS, EC2 (VPC/SG/subnets) and STS `GetCallerIdentity` permissions.
+The `dbPassword` secret must already be set in the stack config (`pulumi config set --secret dbPassword ...`) and committed as an encrypted value in `Pulumi.dev.yaml`, since it is a required Pulumi config secret rather than a GitHub secret.
 
- The `dbPassword` secret must already be set in the stack config (`pulumi config set --secret dbPassword ...`) and committed as an encrypted value in `Pulumi.dev.yaml`, since it is a required Pulumi config secret rather than a GitHub secret.
+To manually trigger a destroy from GitHub: go to **Actions → Pulumi RDS Deployment → Run workflow**, and set the `destroy` input to `true`.
 
- To manually trigger a destroy from GitHub: go to **Actions → Pulumi RDS Deployment → Run workflow**, and set the `destroy` input to `true`.
+## 💬 Help and Community
 
- ## Help and Community
+If you have questions or need assistance:
+- Pulumi Documentation: https://www.pulumi.com/docs/
+- Community Slack: https://slack.pulumi.com/
+- GitHub Issues: https://github.com/pulumi/pulumi/issues
 
- If you have questions or need assistance:
- - Pulumi Documentation: https://www.pulumi.com/docs/
- - Community Slack: https://slack.pulumi.com/
- - GitHub Issues: https://github.com/pulumi/pulumi/issues
-
- Contributions and feedback are always welcome!
+Contributions and feedback are always welcome! 🎉
