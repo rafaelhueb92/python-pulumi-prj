@@ -9,7 +9,7 @@ config = pulumi.Config()
 # Change `db_engine_version` and run `pulumi preview` / `pulumi up` to test a new
 # engine version. Use `pulumi refresh --diff` beforehand to check for drift
 # against the real infrastructure before applying changes.
-db_engine_version = config.get("dbEngineVersion") or "8.0.35"
+db_engine_version = config.get("dbEngineVersion") or "8.0.43"
 db_instance_class = config.get("dbInstanceClass") or "db.t3.micro"
 db_allocated_storage = config.get_int("dbAllocatedStorage") or 20
 db_name = config.get("dbName") or "appdb"
