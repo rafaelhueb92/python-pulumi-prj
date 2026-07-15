@@ -1,0 +1,92 @@
+name: Pulumi RDS Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: "Destroy the stack instead of deploying it"
+        required: true
+        type: boolean
+        default: false
+
+env:
+  PULUMI_STACK: dev
+  AWS_REGION: us-east-1
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  pulumi:
+    name: Pulumi Preview/Up
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.destroy == false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole-${{ github.event.repository.name }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Pulumi CLI
+        uses: pulumi/actions@v5
+
+      - name: Pulumi preview
+        if: github.event_name == 'pull_request'
+        run: pulumi preview --refresh --stack ${{ env.PULUMI_STACK }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: Pulumi up
+        if: github.event_name != 'pull_request'
+        run: pulumi up --refresh --stack ${{ env.PULUMI_STACK }} --yes
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  destroy:
+    name: Pulumi Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.destroy == true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole-${{ github.event.repository.name }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Pulumi CLI
+        uses: pulumi/actions@v5
+
+      - name: Pulumi destroy
+        run: pulumi destroy --refresh --stack ${{ env.PULUMI_STACK }} --yes
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

@@ -1,0 +1,7 @@
+config:
+  aws:region: us-east-1
+  python-pulumi-prj:dbEngineVersion: "8.0.35"
+  python-pulumi-prj:dbInstanceClass: db.t3.micro
+  python-pulumi-prj:dbAllocatedStorage: "20"
+  python-pulumi-prj:dbName: appdb
+  python-pulumi-prj:dbUsername: admin
