@@ -27,4 +27,5 @@ def create_mysql_instance(
         skip_final_snapshot=True,
         apply_immediately=db_config.apply_immediately,
         tags={"Name": f"mysql-instance-{account_id}"},
+        allow_major_version_upgrade=True
     )
