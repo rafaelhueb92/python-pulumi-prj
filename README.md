@@ -51,7 +51,10 @@ This template provisions:
 ## 🗂️ Project Layout
 
 ```
-├── __main__.py                     # Entry point of the Pulumi program (RDS MySQL)
+├── __main__.py                     # Entry point: orchestrates config/network/database modules
+├── config.py                       # Loads and validates Pulumi config (DbConfig)
+├── network.py                      # Default VPC lookup, RDS subnet group, security group
+├── database.py                     # RDS MySQL instance resource
 ├── Pulumi.yaml                     # Project metadata and template configuration
 ├── Pulumi.<stack>.yaml             # Stack-specific configuration (e.g., Pulumi.dev.yaml)
 ├── requirements.txt                # Python dependencies
